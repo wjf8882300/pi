@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <title></title>
+    <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"
+            type="text/javascript"></script>
+
+    <script>
+        var option = {
+            "ServerUri": "192.168.32.48",
+            "ServerPort": 8083,
+            "UserName": "raspbian_server", // 用户名由接口获取
+            "Password": "AgeDHL8ucqp5Tz9R", // 密码由接口获取
+            "ClientId": "raspbian_server", // ClientId由接口获取
+            "TimeOut": 5,
+            "KeepAlive": 100,
+            "CleanSession": false,
+            "SSL": true
+        }
+
+        var client;
+
+        // Create a client instance
+        client = new Paho.MQTT.Client(option.ServerUri, option.ServerPort, option.ClientId);
+
+        // set callback handlers
+        client.onConnectionLost = onConnectionLost;
+        client.onMessageArrived = onMessageArrived;
+        // connect server
+        client.connect({
+            invocationContext: {
+                host: option.ServerUri,//IP地址
+                port: option.ServerPort,//端口号
+                path: client.path,
+                clientId: option.ClientId//标识
+            },
+            timeout: option.TimeOut,//连接超时时间
+            keepAliveInterval: option.KeepAlive,//心跳间隔
+            cleanSession: option.CleanSession,//是否清理Session
+            useSSL: option.SSL,//是否启用SSL
+            userName: option.UserName,  //用户名
+            password: option.Password,  //密码
+            onSuccess: onConnect,//连接成功回调事件
+            onFailure: onError//连接失败回调事件
+        });
+
+        // called when the client connects
+        function onConnect() {
+            print("连接成功");
+        }
+
+        function onError(e) {
+            print("连接失败" + e);
+        }
+
+        // called when the client loses its connection
+        function onConnectionLost(responseObject) {
+            if (responseObject.errorCode !== 0) {
+                console.log("onConnectionLost:" + responseObject.errorMessage);
+            }
+        }
+
+        // called when a message arrives
+        function onMessageArrived(message) {
+            // 打印接收到的消息
+            print("onMessageArrived:" + message.payloadString);
+        }
+
+        function sendMessage(str) {
+            message = new Paho.Message(str);
+	        message.destinationName = "pi/cmd";
+	        client.send(message);
+        }
+
+    </script>
+</head>
+
+<body>
+<div id="msg">
+</div>
+</body>
+
+</html>

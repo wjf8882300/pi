@@ -1,0 +1,19 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: password
+logging:
+  level:
+    com.tongu.search: DEBUG
+    org.springframework: INFO
+
+mqtt:
+  client-list:
+    home:
+      connection-string: ws://192.168.32.48:8083
+      username: raspbian_server
+      password: AgeDHL8ucqp5Tz9R
+      producer:
+        client-id: raspbian_server
